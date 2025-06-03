@@ -1,0 +1,89 @@
+---
+import { SITE_TITLE } from "../consts";
+---
+<header class="site-header">
+    <div class="banner" role="banner">
+        <div class="header-title">
+          <a href="/">{SITE_TITLE}</a>
+          <p>basierend auf <a class="pill" href="http://134.34.26.182/roomresrrm/">RoomRes</a></p>
+        </div>
+        <a id="header-logo" href="https://stuve.uni-konstanz.de" target="_blank" class="logo-large">
+            <img id="logo" class="uni-logo" alt="StuVe Konstanz" src="/images/stuve_logo.png" width="737" height="283">
+        </a>
+    </div>
+</header>
+
+<style>
+.site-header {
+    display: flex;
+    flex-direction: column;
+
+    background-color: var(--background);
+    z-index: 9999;
+
+    width: 100%;
+}
+
+.site-header * {
+    user-select: none;
+}
+
+.site-header .banner .title {
+    font-size: 2em;
+    font-weight: var(--bold-weight);
+}
+
+.site-header div.banner {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1em 1em 0 1em;
+
+    border-bottom: var(--seperator);
+}
+
+.site-header div.banner > .header-title > a, .site-header div.banner > #header-logo {
+    font-size: 1.5em;
+    border: none;
+}
+
+.logo-large {
+    display: block;
+    width: 8em;
+    fill: var(--text);
+
+    padding: 8px;
+}
+
+a#header-logo:hover {
+    background-color: transparent;
+}
+
+a.pill {
+  background-color: var(--primary);
+  border-radius: 5px;
+  border: none;
+  margin: 0 5px;
+  padding: 2px 5px;
+  font-weight: bold;
+  z-index: 9999;
+}
+
+@media screen and (max-width: 800px) {
+    .site-header #header-logo {
+        content: '';
+        background-color: var(--primary);
+        width: 50px;
+        height: 50px;
+    }
+
+    .site-header div.banner .title {
+        font-size: 1.5rem;
+    }
+
+    .site-header #header-logo svg, .site-header #header-logo img {
+        display: none;
+    }
+}
+</style>

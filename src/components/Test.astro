@@ -1,0 +1,78 @@
+---
+---
+
+<div id="content">
+
+</div>
+
+<script>
+  async function fetchAllRooms() {
+    const url = 'http://134.34.26.182/TestRRM/WcfDataService.svc/GetAllRooms()?$orderby%20=%20Raum';
+
+    const data = [];
+
+    // Fetch the XML data
+    try {
+      const response = await fetch(url);
+      const xmlString = await response.text();
+
+      // Parse the XML string
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(xmlString, "text/xml");
+
+      // Extract the entries
+      const entries = xmlDoc.querySelectorAll('entry');
+
+      // Define namespaces
+      const atomNS = "http://www.w3.org/2005/Atom";
+      const mNS = "http://schemas.microsoft.com/ado/2007/08/dataservices/metadata";
+      const dNS = "http://schemas.microsoft.com/ado/2007/08/dataservices"
+
+      // Process each entry
+      entries.forEach(entry => {
+        // To get <content> (in default namespace):
+        const content = xmlDoc.getElementsByTagNameNS(atomNS, "content")[0];
+        const properties = content.getElementsByTagNameNS(mNS, "properties")[0];
+
+        // Extract data from each entry
+        const ResRaumID = properties.getElementsByTagNameNS(dNS, "Veranstaltung")[0];
+        const Geb = properties.getElementsByTagNameNS(dNS, "Geb")[0];
+        const Raum = properties.getElementsByTagNameNS(dNS, "Raum")[0];
+        const Raumnr = properties.getElementsByTagNameNS(dNS, "Raumnr")[0];
+        const Raumcode = properties.getElementsByTagNameNS(dNS, "Raumcode")[0];
+        const Anmerkungen = properties.getElementsByTagNameNS(dNS, "Anmerkungen")[0];
+
+        // Store extracted data in an object
+        const entryData = {
+          ResRaumID: ResRaumID ? ResRaumID.textContent : null,
+          Geb: Geb ? Geb.textContent : null,
+          Raum: Raum ? Raum.textContent : null,
+          Raumnr: Raumnr ? Raumnr.textContent : null,
+          Raumcode: Raumcode ? Raumcode.textContent : null,
+          Anmerkungen: Anmerkungen ? Anmerkungen.textContent : null
+        };
+
+        // Push the entry data into the array
+        data.push(entryData);
+      });
+      return data;
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      return [];
+    }
+  }
+
+  const fill = async () => {
+    const data = await fetchAllRooms();
+
+    let content = "";
+    data.forEach((entry) => {
+      content += `<p>${entry.Raum}</p>`;
+    });
+
+    document.getElementById("content").innerHTML = content;
+  };
+
+  fill();
+
+</script>
