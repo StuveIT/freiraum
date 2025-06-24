@@ -1,78 +1,123 @@
 ---
+import NavigationBar from './NavigationBar.astro';
 ---
+<NavigationBar />
 
 <div id="content">
-
+  
 </div>
 
-<script>
-  async function fetchAllRooms() {
-    const url = 'http://134.34.26.182/TestRRM/WcfDataService.svc/GetAllRooms()?$orderby%20=%20Raum';
+<script type="module">
+  import { fetchAllRooms } from '/js/room.js';
+  import { fetchAllEventsForDate, fetchCurrentEvents } from '/js/event.js';
 
-    const data = [];
+  const contentElem = document.getElementById("content");
 
-    // Fetch the XML data
-    try {
-      const response = await fetch(url);
-      const xmlString = await response.text();
-
-      // Parse the XML string
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(xmlString, "text/xml");
-
-      // Extract the entries
-      const entries = xmlDoc.querySelectorAll('entry');
-
-      // Define namespaces
-      const atomNS = "http://www.w3.org/2005/Atom";
-      const mNS = "http://schemas.microsoft.com/ado/2007/08/dataservices/metadata";
-      const dNS = "http://schemas.microsoft.com/ado/2007/08/dataservices"
-
-      // Process each entry
-      entries.forEach(entry => {
-        // To get <content> (in default namespace):
-        const content = xmlDoc.getElementsByTagNameNS(atomNS, "content")[0];
-        const properties = content.getElementsByTagNameNS(mNS, "properties")[0];
-
-        // Extract data from each entry
-        const ResRaumID = properties.getElementsByTagNameNS(dNS, "Veranstaltung")[0];
-        const Geb = properties.getElementsByTagNameNS(dNS, "Geb")[0];
-        const Raum = properties.getElementsByTagNameNS(dNS, "Raum")[0];
-        const Raumnr = properties.getElementsByTagNameNS(dNS, "Raumnr")[0];
-        const Raumcode = properties.getElementsByTagNameNS(dNS, "Raumcode")[0];
-        const Anmerkungen = properties.getElementsByTagNameNS(dNS, "Anmerkungen")[0];
-
-        // Store extracted data in an object
-        const entryData = {
-          ResRaumID: ResRaumID ? ResRaumID.textContent : null,
-          Geb: Geb ? Geb.textContent : null,
-          Raum: Raum ? Raum.textContent : null,
-          Raumnr: Raumnr ? Raumnr.textContent : null,
-          Raumcode: Raumcode ? Raumcode.textContent : null,
-          Anmerkungen: Anmerkungen ? Anmerkungen.textContent : null
-        };
-
-        // Push the entry data into the array
-        data.push(entryData);
-      });
-      return data;
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      return [];
-    }
+  function displayUnreachable() {
+    contentElem.innerHTML = `⚠️ Dein Browser konnte keine Anfrage an <a href="134.34.26.182">RoomRes</a> stellen. Das kann folgende Gründe haben: 
+    <ul>
+      <li>Du bist nicht im Uni-Netz. Falls du dich nicht an der Uni Konstanz aufhälst, kannst du ein VPN benutzen (Siehe: <a href="https://www.kim.uni-konstanz.de/e-mail-und-internet/eduvpn/">KIM Website</a>)</li>
+      <li>Dein Browser upgraded deine HTTP Verbindung zu HTTPS. RoomRes ist gerade nur unter dem HTTP Protokoll erreichbar --- wir arbeiten mit dem KIM zusammen, um das zu verbessern</li>
+      <li>RoomRes ist gerade nicht erreichbar</li>
+    </ul>`;
   }
 
-  const fill = async () => {
-    const data = await fetchAllRooms();
+  function displayTable(roomsWithEvents) {
+    const timeline = document.createElement('table');
+    timeline.classList.add('timeline');
+    timeline.style = `
+      background: white;
+      display: block;
+      overflow-x: scroll;
+      width: 80vw;
+    `;
+    const timeline_body = document.createElement('tbody');
 
-    let content = "";
-    data.forEach((entry) => {
-      content += `<p>${entry.Raum}</p>`;
+    const timeline_header_row = document.createElement('tr');
+    const thr_name = document.createElement('th');
+    thr_name.innerText = 'Raum';
+    timeline_header_row.appendChild(thr_name);
+
+    for (let i = 0; i < 24; i++) {
+      const thr_time = document.createElement('th');
+      thr_time.classList.add('time');
+      thr_time.dataset.time = i;
+      thr_time.innerText = `${String(i).padStart(2, '0')}:00`;
+      timeline_header_row.appendChild(thr_time);
+    }
+
+    timeline_body.appendChild(timeline_header_row);
+    timeline.appendChild(timeline_body);
+
+    roomsWithEvents.forEach(roomWithEvents => {
+      const { room, events } = roomWithEvents;
+
+      const tr_room_events = document.createElement('tr');
+      const td_room = document.createElement('td');
+      td_room.classList.add('room');
+      td_room.innerText = room.name;
+      tr_room_events.appendChild(td_room);
+
+      // add events
+      const trr_events_div = document.createElement('td');
+      trr_events_div.classList.add('event-group');
+      events.forEach(e => {
+        const div_event = document.createElement('div');
+        div_event.classList.add('event');
+
+        const time_factor_start = e.time_start.getHours() + e.time_start.getMinutes() / 60;
+        const time_factor_end = e.time_end.getHours() + e.time_end.getMinutes() / 60;
+        const time_factor_span = time_factor_end - time_factor_start;
+        div_event.innerText = e.name;
+        div_event.title = `${e.name}\n${e.time_start}\n${e.time_end}`;
+        div_event.style = `left: ${100 * time_factor_start}px; width: ${100 * time_factor_span}px`;
+        
+        trr_events_div.appendChild(div_event);
+      });
+      tr_room_events.appendChild(trr_events_div);
+
+      timeline_body.appendChild(tr_room_events);
     });
+    
+    contentElem.innerHTML = timeline.outerHTML;
+  }
 
-    document.getElementById("content").innerHTML = content;
-  };
+  // fetch currently available events
+  function fetchCurrentlyAvailable() {
+    const now = new Date();
 
-  fill();
+    return fetchAllEventsForDate(now).then(events => {
+      const sortedEvents = events.sort((a, b) => {
+        return a.time_start - b.time_start;
+      });
 
+      return fetchAllRooms().then(rooms => {
+        const roomsWithEvents = rooms.map((room) => {
+          const roomEvents = [];
+          for(let j = 0; j < sortedEvents.length; j++) {
+            const currEvent = sortedEvents[j];
+
+            if(currEvent.room_name != room.name)
+              continue;
+            
+            roomEvents.push(currEvent);
+          }
+
+          return {
+            room: room,
+            events: roomEvents
+          };
+        });
+
+        return roomsWithEvents;
+      })
+    });
+  }
+
+  fetchCurrentlyAvailable().then(roomsWithEvents => {
+    displayTable(roomsWithEvents);
+  }).catch((error) => {
+    console.error(error);
+    displayUnreachable();
+  })
 </script>

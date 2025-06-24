@@ -270,3 +270,46 @@ form input[type=submit] {
         padding: 1.5em;
     }
 }
+
+table.timeline {
+  background: white;
+  display: block;
+  overflow-x: scroll;
+  width: 80vw;
+
+  padding: 1em 0;
+}
+
+table.timeline th, table.timeline td.room {
+  background-color: white;
+  padding: 4px;
+  border: var(--seperator);
+}
+
+table.timeline > tbody > tr > :first-child {
+  position: sticky;
+  left: 0;
+  z-index: 400;
+}
+
+table.timeline > tbody > td:not(:first-child), table.timeline > tbody th.time {
+  width: 100px;
+  max-width: 100px;
+  min-width: 100px;
+}
+
+table.timeline td.event-group {
+  position: relative;
+  height: fit-content;
+  padding: 2px;
+}
+
+table.timeline td.event-group div.event {
+  position: absolute;
+  top: 0px;
+  overflow: hidden;
+  padding: 4px;
+  background-color: var(--primary);
+  border-radius: 2px;
+  height: 28px;
+}
