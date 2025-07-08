@@ -3,6 +3,7 @@ import NavigationBar from './NavigationBar.astro';
 ---
 <NavigationBar />
 
+<input type="date" id="date-picker">
 <div id="content">
   
 </div>
@@ -12,6 +13,8 @@ import NavigationBar from './NavigationBar.astro';
   import { fetchAllEventsForDate, fetchCurrentEvents } from '/js/event.js';
 
   const contentElem = document.getElementById("content");
+  const datePicker = document.getElementById("date-picker");
+  datePicker.valueAsDate = new Date();
 
   function displayUnreachable() {
     contentElem.innerHTML = `⚠️ Dein Browser konnte keine Anfrage an <a href="134.34.26.182">RoomRes</a> stellen. Das kann folgende Gründe haben: 
@@ -38,7 +41,8 @@ import NavigationBar from './NavigationBar.astro';
     thr_name.innerText = 'Raum';
     timeline_header_row.appendChild(thr_name);
 
-    for (let i = 0; i < 24; i++) {
+    const offset_hour = 8;    
+    for (let i = offset_hour; i < 24; i++) {
       const thr_time = document.createElement('th');
       thr_time.classList.add('time');
       thr_time.dataset.time = i;
@@ -65,8 +69,10 @@ import NavigationBar from './NavigationBar.astro';
         const div_event = document.createElement('div');
         div_event.classList.add('event');
 
-        const time_factor_start = e.time_start.getHours() + e.time_start.getMinutes() / 60;
-        const time_factor_end = e.time_end.getHours() + e.time_end.getMinutes() / 60;
+        const time_factor_offset = offset_hour;
+
+        const time_factor_start = (e.time_start.getHours() - offset_hour) + (e.time_start.getMinutes() / 60);
+        const time_factor_end = (e.time_end.getHours() - offset_hour) + e.time_end.getMinutes() / 60;
         const time_factor_span = time_factor_end - time_factor_start;
         div_event.innerText = e.name;
         div_event.title = `${e.name}\n${e.time_start}\n${e.time_end}`;
@@ -83,10 +89,11 @@ import NavigationBar from './NavigationBar.astro';
   }
 
   // fetch currently available events
-  function fetchCurrentlyAvailable() {
-    const now = new Date();
+  function fetchAvailable(fetch_date) {
+    if (!fetch_date)
+      fetch_date = new Date();
 
-    return fetchAllEventsForDate(now).then(events => {
+    return fetchAllEventsForDate(fetch_date).then(events => {
       const sortedEvents = events.sort((a, b) => {
         return a.time_start - b.time_start;
       });
@@ -114,10 +121,17 @@ import NavigationBar from './NavigationBar.astro';
     });
   }
 
-  fetchCurrentlyAvailable().then(roomsWithEvents => {
+  const update = (new_date) => fetchAvailable(new_date).then(roomsWithEvents => {
     displayTable(roomsWithEvents);
   }).catch((error) => {
     console.error(error);
     displayUnreachable();
-  })
+  });
+  update();
+
+  datePicker.addEventListener('change', (e) => {
+    const new_date = new Date(e.target.value);
+    update(new_date);
+  });
+
 </script>
