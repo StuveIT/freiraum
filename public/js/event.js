@@ -5,8 +5,8 @@ export class Event {
     this.name = name;
     this.room_name = room_name;
     this.subject = subject;
-    this.time_start = dateFromTime(time_start, dayString);
-    this.time_end = dateFromTime(time_end, dayString);
+    this.time_start = typeof time_start === 'string' ? dateFromTime(time_start, dayString) : time_start;
+    this.time_end = typeof time_end === 'string' ? dateFromTime(time_end, dayString) : time_end;
 
     this.duration = this.time_end - this.time_start;
   }
@@ -62,4 +62,8 @@ export function fetchCurrentEvents() {
   const url = `http://134.34.26.182/TestRRM/WcfDataService.svc/GetAllEvents()?$filter=(TDate%20eq%20datetime%27${dayString}%27)%20and%20Btime%20gt%20${timeString}%20and%20Atime%20lt%20${timeString}&$orderby%20=%20TDate,AUhrzeit,BUhrzeit`;
 
   return fetchXML(url, eventMap);
+}
+
+export function fetchFreiraume(date) {
+  const events = fetchAllEventsForDate(date);
 }
