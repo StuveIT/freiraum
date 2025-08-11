@@ -63,7 +63,3 @@ export function fetchCurrentEvents() {
 
   return fetchXML(url, eventMap);
 }
-
-export function fetchFreiraume(date) {
-  const events = fetchAllEventsForDate(date);
-}
