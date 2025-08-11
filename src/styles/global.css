@@ -261,6 +261,7 @@ form input[type=submit] {
 
     main {
         width: 100%;
+        padding: 0;
     }
 
     main > div.card {
@@ -275,9 +276,8 @@ table.timeline {
   background: white;
   display: block;
   overflow-x: scroll;
-  width: 80vw;
-
-  padding: 1em 0;
+  width: 100%;
+  border-spacing: 1px;
 }
 
 table.timeline th, table.timeline td.room {
@@ -312,4 +312,11 @@ table.timeline td.event-group div.event {
   background-color: var(--primary);
   border-radius: 2px;
   height: 28px;
+}
+
+#indicator {
+  position: sticky;
+  border-right: 2px solid red;
+  z-index: 1000;
+  transform: translateX(-2px); /* Should be hidden from the start */
 }

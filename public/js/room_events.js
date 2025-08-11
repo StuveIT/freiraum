@@ -44,7 +44,6 @@ export function fetchAvailable(fetch_date) {
     const freiraume = [];
 
     roomsWithEvents.forEach(roomWithEvents => {
-      console.log(roomWithEvents);
       const { room, events } = roomWithEvents;
       const slots = [];
 

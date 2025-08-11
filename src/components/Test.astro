@@ -14,6 +14,9 @@ import Card from './Card.astro';
   import { fetchAvailable } from '/js/room_events.js';
 
   const contentElem = document.getElementById("content");
+  
+  const hour_offset = 8;
+  const hour_width = 101;
 
   function displayUnreachable() {
     contentElem.innerHTML = `⚠️ Dein Browser konnte keine Anfrage an <a href="134.34.26.182">RoomRes</a> stellen. Das kann folgende Gründe haben: 
@@ -24,7 +27,7 @@ import Card from './Card.astro';
     </ul>`;
   }
 
-  function displayTable(roomsWithEvents, new_date) {
+  function displayTable(roomsWithEvents) {
     const date_picker = document.createElement('input');
     date_picker.style = "width: 100%";
     date_picker.type = "date";
@@ -32,11 +35,7 @@ import Card from './Card.astro';
 
     const timeline = document.createElement('table');
     timeline.classList.add('timeline');
-    timeline.style = `
-      display: block;
-      overflow-x: scroll;
-      width: 100%;
-    `;
+    
     const timeline_body = document.createElement('tbody');
 
     const timeline_header_row = document.createElement('tr');
@@ -44,8 +43,7 @@ import Card from './Card.astro';
     thr_name.innerText = 'Raum';
     timeline_header_row.appendChild(thr_name);
 
-    const offset_hour = 8;    
-    for (let i = offset_hour; i < 24; i++) {
+    for (let i = hour_offset; i < 24; i++) {
       const thr_time = document.createElement('th');
       thr_time.classList.add('time');
       thr_time.dataset.time = i;
@@ -72,14 +70,14 @@ import Card from './Card.astro';
         const div_event = document.createElement('div');
         div_event.classList.add('event');
 
-        const time_factor_offset = offset_hour;
+        const time_factor_offset = hour_offset;
 
-        const time_factor_start = (e.time_start.getHours() - offset_hour) + (e.time_start.getMinutes() / 60);
-        const time_factor_end = (e.time_end.getHours() - offset_hour) + e.time_end.getMinutes() / 60;
+        const time_factor_start = (e.time_start.getHours() - hour_offset) + (e.time_start.getMinutes() / 60);
+        const time_factor_end = (e.time_end.getHours() - hour_offset) + e.time_end.getMinutes() / 60;
         const time_factor_span = time_factor_end - time_factor_start;
         div_event.innerText = e.name;
         div_event.title = `${e.name}\n${e.time_start}\n${e.time_end}`;
-        div_event.style = `left: ${100 * time_factor_start}px; width: ${100 * time_factor_span}px`;
+        div_event.style = `left: ${hour_width * time_factor_start}px; width: ${hour_width * time_factor_span}px`;
         
         trr_events_div.appendChild(div_event);
       });
@@ -87,21 +85,53 @@ import Card from './Card.astro';
 
       timeline_body.appendChild(tr_room_events);
     });
+
+    let indicator = document.createElement('div');
+    indicator.id = "indicator";
+
+    let table_container = document.createElement('div');
+    table_container.style = "display: flex; flex-direction: row; overflow: hidden;";
+    table_container.appendChild(indicator);
+    table_container.appendChild(timeline);
+
+    contentElem.innerHTML = date_picker.outerHTML + table_container.outerHTML;
+  }
+
+  const updateIndicator = () => {
+      // time pos
+      let time_x_pos = hour_width * ((new Date()).getHours() - hour_offset);
+
+      // scroll to current time
+      let timeline = document.getElementsByClassName("timeline")[0];
+      let curr_left = timeline.scrollLeft;
     
-    contentElem.innerHTML = date_picker.outerHTML + timeline.outerHTML;
+      // update indicator
+      let indicator = document.getElementById("indicator");
+      indicator.style.transform = `translateX(${time_x_pos - curr_left + hour_width}px)`;
   }
 
   const update = (new_date) => fetchAvailable(new_date).then(roomsWithEvents => {
     displayTable(roomsWithEvents);
-
+    
+    // update datePicker value
     let datePicker = document.getElementById("date-picker");
     datePicker.valueAsDate = new_date ? new Date(new_date) : new Date();
     datePicker.addEventListener("change", e => {
       update(new Date(e.target.value))
-    })
+    });
+
+    // time pos
+    let time_x_pos = hour_width * ((new Date()).getHours() - hour_offset);
+
+    // scroll to current time
+    let timeline = document.getElementsByClassName("timeline")[0];
+    timeline.scrollTo(time_x_pos, 0)
+    timeline.addEventListener("scroll", updateIndicator);
   }).catch((error) => {
     console.error(error);
     displayUnreachable();
   });
   update();
+
+  setInterval(updateIndicator, 60000);
 </script>
