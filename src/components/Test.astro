@@ -13,9 +13,11 @@ import Card from './Card.astro';
 <script type="module">
   import { fetchAvailable } from '/js/room_events.js';
   import { TimelineUI } from "/js/timeline.js";
+  import { GeoUI } from "/js/geo.js";
   
   const content_elem = document.getElementById("content");
   const timeline = new TimelineUI();
+  const geo = new GeoUI();
 
   function displayUnreachable() {
     content_elem = `⚠️ Dein Browser konnte keine Anfrage an <a href="134.34.26.182">RoomRes</a> stellen. Das kann folgende Gründe haben: 
@@ -37,8 +39,11 @@ import Card from './Card.astro';
 
   function update(new_date) {
     fetchAvailable(new_date).then(roomsWithEvents => {
-      display(timeline.display(roomsWithEvents));
-      setInterval(timeline.updateIndicator(), 60000);
+      // display(timeline.display(roomsWithEvents));
+      // setInterval(timeline.updateIndicator(), 60000);
+      
+      display(geo.initialize());
+      geo.display(roomsWithEvents);
     }).catch((error) => {
       console.error(error);
       displayUnreachable();

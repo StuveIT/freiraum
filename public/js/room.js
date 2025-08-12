@@ -1,13 +1,14 @@
 import { fetchXML } from '/js/fetcher.js';
 
 export class Room {
-  constructor(id, name, building, room_no, room_code, comments) {
+  constructor(id, name, building, room_no, room_code, comments, number_of_seats) {
     this.id = id;
     this.name = name;
     this.building = building;
     this.room_no = room_no;
     this.room_code = room_code;
     this.comments = comments;
+    this.number_of_seats = number_of_seats;
   }
 
   toHTML() {
@@ -32,6 +33,7 @@ export function fetchAllRooms() {
     const Raumnr = properties.getElementsByTagNameNS(dNS, "Raumnr")[0];
     const Raumcode = properties.getElementsByTagNameNS(dNS, "Raumcode")[0];
     const Anmerkungen = properties.getElementsByTagNameNS(dNS, "Anmerkungen")[0];
+    const Platzanzahl = properties.getElementsByTagNameNS(dNS, "Platzanzahl")[0];
 
     // Store extracted data in an object
     return new Room(
@@ -40,7 +42,8 @@ export function fetchAllRooms() {
       Geb ? Geb.textContent : null,
       Raumnr ? Raumnr.textContent : null,
       Raumcode ? Raumcode.textContent : null,
-      Anmerkungen ? Anmerkungen.textContent : null
+      Anmerkungen ? Anmerkungen.textContent : null,
+      Platzanzahl ? Platzanzahl.textContent : null
     );
   });
 }

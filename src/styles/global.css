@@ -321,3 +321,9 @@ table.timeline td.event-group div.event {
   z-index: 1000;
   transform: translateX(-2px); /* Should be hidden from the start */
 }
+
+#map {
+  width: 100vw;
+  max-width: 100%;
+  height: 80vh;
+}
