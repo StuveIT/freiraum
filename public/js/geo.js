@@ -30,7 +30,7 @@ export class GeoUI {
       const { room, events } = roomWithEvents;
 
       let now = new Date();
-      if (events.filter(event => (event.time_start > now || event.time_end < now) && event.name == "Freiraum").length == 0) {
+      if (events.filter(event => (event.time_start > now || event.time_end < now) && event.name == "Freiraum").length > 0) {
         if (!buildings[room.building]) // if the building is not in the map yet...
           buildings[room.building] = { // create the required object
             vacant_seats: 0,

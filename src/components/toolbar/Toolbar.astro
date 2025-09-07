@@ -1,0 +1,30 @@
+---
+import Item from "./Item.astro";
+---
+<div id="toolbar">
+  <slot />
+</div>
+
+<style>
+  #toolbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+</style>
+
+<script>
+  const toolbar = document.getElementById('toolbar');
+
+  let selected = 0;
+  selectItem(selected);
+  Array.from(toolbar.children).forEach((item, index) => {
+    item.addEventListener("click", (e) => selectItem(index, e));
+  });
+
+  function selectItem(index, e) {
+    toolbar.children[selected].classList.remove("selected");
+    toolbar.children[index].classList.add("selected");
+    selected = index;
+  }
+</script>

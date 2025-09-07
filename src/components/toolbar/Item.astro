@@ -1,0 +1,57 @@
+---
+const { onclick } = Astro.props;
+---
+<div class="holder" onclick={onclick}>
+  <div class="item">
+    <div class="content">
+      <slot />
+    </div>
+  </div>
+</div>
+
+<style>
+  .holder {
+    display: flex;
+    justify-content: center;
+  }
+
+  .item {
+    z-index: 100;
+    margin: 0 16px;
+    display: flex;
+    flex-direction: row;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .item, .item::before, .item::after {
+    background: rgb(204, 238, 249);
+  }
+
+  .content {
+    padding: 4px;
+  }
+
+  .item::before, .item::after {
+    position: relative;
+    display: block;
+    width: 16px;
+    height: 100%;
+    z-index: 99;
+    content: '';
+  }
+
+  .holder.selected > .item, .holder.selected > .item::before, .holder.selected .item::after {
+    background: white;
+  }
+
+  .item::before {
+    border-radius: 8px 0 0 0;
+    transform: skew(-20deg) translateX(-50%);
+  }
+  .item::after {
+    border-radius: 0 8px 0 0;
+    transform: skew(20deg) translateX(50%);
+  }
+</style>
