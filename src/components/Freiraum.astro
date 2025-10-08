@@ -1,0 +1,130 @@
+---
+import Card from './Card.astro';
+import Item from './toolbar/Item.astro';
+---
+
+  <div id="ok" class="hide">
+    <Card>
+      <Item slot="toolbar">Timeline</Item>
+      <Item slot="toolbar">Karte</Item>
+
+      <div id="content" slot="body">
+      </div>
+    </Card>
+  </div>
+  <div id="error" class="hide">
+    <Card>
+      <div slot="body">
+      ⚠️ Dein Browser konnte keine Anfrage an <a href="134.34.26.182">RoomRes</a> stellen. Das kann folgende Gründe haben: 
+      <ul>
+        <li>Du bist nicht im Uni-Netz. Falls du dich nicht an der Uni Konstanz aufhälst, kannst du ein VPN benutzen (Siehe: <a href="https://www.kim.uni-konstanz.de/e-mail-und-internet/eduvpn/">KIM Website</a>)</li>
+        <li>Dein Browser upgraded deine HTTP Verbindung zu HTTPS. RoomRes ist gerade nur unter dem HTTP Protokoll erreichbar --- wir arbeiten mit dem KIM zusammen, um das zu verbessern</li>
+        <li>RoomRes ist gerade nicht erreichbar</li>
+      </ul>
+      </div>
+    </Card>
+  </div>
+  <div id="loading">
+  </div>
+  
+<script type="module" is:inline>
+  import { fetchAvailable } from '/js/room_events.js';
+  import { TimelineUI } from "/js/timeline.js";
+  import { GeoUI } from "/js/geo.js";
+
+  const OK_ELEM = document.getElementById("ok");
+  const ERROR_ELEM = document.getElementById("error");
+  const LOADING_ELEM = document.getElementById("loading");
+  
+  const content_elem = document.getElementById("content");
+  const timeline = new TimelineUI();
+  const geo = new GeoUI();
+
+  const VIEW_CLASS = 'view';
+  const HIDE_CLASS = 'hide';
+  const TIMELINE_ID = 'timeline';
+  const MAP_ID = 'map';
+
+  let curr_view_index = 0;
+
+  /* ----------------------
+   *   DATA
+  ---------------------- */
+  let ROOMS_WITH_EVENTS;
+  function update_data(new_date) {
+    fetchAvailable(new_date).then(roomsWithEvents => {
+      ROOMS_WITH_EVENTS = roomsWithEvents;
+      LOADING_ELEM.classList.toggle(HIDE_CLASS, true);
+      OK_ELEM.classList.toggle(HIDE_CLASS, false);
+      display(new_date ? new_date : new Date());
+    }).catch((error) => {
+      console.error(error);
+      LOADING_ELEM.classList.toggle(HIDE_CLASS, true);
+      ERROR_ELEM.classList.toggle(HIDE_CLASS, false);
+    });
+  }
+
+  /* ----------------------
+   *   ADD ALL DISPLAYS
+  ---------------------- */
+  function display(new_date) {
+    content_elem.innerHTML = "";
+    const now = new Date();
+
+    // DATE PICKER
+    const date_picker = document.createElement('input');
+    date_picker.style = "width: 100%";
+    date_picker.type = "date";
+    date_picker.id = "date-picker";
+    date_picker.valueAsNumber = new_date;
+    date_picker.addEventListener("change", (e) => {
+      console.log(e.target);
+      update_data(e.target.valueAsDate);
+    });
+    
+    content_elem.appendChild(date_picker);
+
+    // TIMELINE
+    const timeline_elem = timeline.display(ROOMS_WITH_EVENTS);
+    timeline_elem.id = TIMELINE_ID;
+    timeline_elem.classList.add(VIEW_CLASS);
+    content_elem.appendChild(timeline_elem);
+
+    // MAP
+    const map_elem = geo.initialize();
+    map_elem.id = MAP_ID;
+    map_elem.classList.add(VIEW_CLASS);
+    content_elem.appendChild(map_elem);
+    geo.display(ROOMS_WITH_EVENTS);
+
+    // HIDDE ALL + ONLY SHOW INITIAL
+    set_view(curr_view_index);
+  }
+
+  /* ----------------------
+   *   NAVIGATION
+  ---------------------- */
+  const nav_items = document.querySelectorAll(".holder");
+  nav_items.forEach((item, index) => {
+    item.addEventListener("click", () => {
+      if(!ROOMS_WITH_EVENTS) {
+        return;
+      }
+
+      set_view(index);
+    });
+  });
+
+  /* ----------------------
+   *   VIEW INDEX
+  ---------------------- */
+  const set_view = (index) => {
+    curr_view_index = index;
+    const views = document.getElementsByClassName(VIEW_CLASS);
+    for (let i = 0; i < views.length; i++) {
+      views[i].classList.toggle(HIDE_CLASS, i != index);
+    }
+  }
+
+  update_data();
+</script>

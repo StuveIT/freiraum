@@ -1,7 +1,9 @@
 export class TimelineUI {
 
-  hour_offset = 8;
-  hour_width = 101;
+  constructor() {
+    this.hour_offset = 8;
+    this.hour_width = 101;
+  }
 
   display(roomsWithEvents) {
     const timeline = document.createElement('table');
@@ -41,8 +43,6 @@ export class TimelineUI {
         const div_event = document.createElement('div');
         div_event.classList.add('event');
 
-        const time_factor_offset = this.hour_offset;
-
         const time_factor_start = (e.time_start.getHours() - this.hour_offset) + (e.time_start.getMinutes() / 60);
         const time_factor_end = (e.time_end.getHours() - this.hour_offset) + e.time_end.getMinutes() / 60;
         const time_factor_span = time_factor_end - time_factor_start;
@@ -61,27 +61,24 @@ export class TimelineUI {
     indicator.id = "indicator";
 
     let table_container = document.createElement('div');
-    table_container.style = "display: flex; flex-direction: row; overflow: hidden;";
+    table_container.classList.add('timeline_container');
     table_container.appendChild(indicator);
     table_container.appendChild(timeline);
 
     // time pos
-    let time_x_pos = this.hour_width * ((new Date()).getHours() - this.hour_offset);
-    timeline.addEventListener("scroll", this.updateIndicator);
+    timeline.addEventListener("scroll", () => {
+      // time pos
+      let time_x_pos = this.hour_width * ((new Date()).getHours() - this.hour_offset);
+
+      // scroll to current time
+      let timeline = document.getElementsByClassName("timeline")[0];
+      let curr_left = timeline.scrollLeft;
+
+      // update indicator
+      let indicator = document.getElementById("indicator");
+      indicator.style.transform = `translateX(${time_x_pos - curr_left + this.hour_width}px)`;
+    });
 
     return table_container;
-  }
-
-  updateIndicator() {
-    // time pos
-    let time_x_pos = this.hour_width * ((new Date()).getHours() - this.hour_offset);
-
-    // scroll to current time
-    let timeline = document.getElementsByClassName("timeline")[0];
-    let curr_left = timeline.scrollLeft;
-
-    // update indicator
-    let indicator = document.getElementById("indicator");
-    indicator.style.transform = `translateX(${time_x_pos - curr_left + this.hour_width}px)`;
   }
 }
