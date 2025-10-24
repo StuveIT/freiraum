@@ -310,6 +310,7 @@ table.timeline td.event-group div.event {
   padding: 4px;
   background-color: var(--primary);
   border-radius: 2px;
+  height: 34px;
 }
 
 #indicator {

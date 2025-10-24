@@ -48,22 +48,17 @@ export function fetchAvailable(fetch_date) {
       const slots = [];
 
       let startOfSpan = fetch_date;
-      startOfSpan.setHours(8, 0, 0, 0);
+      startOfSpan = new Date(startOfSpan.setHours(8, 0, 0, 0));
 
       let endOfDay = fetch_date;
       endOfDay.setHours(23, 59, 59, 999);
 
-      for (let i = 0; i <= events.length; i++) { // for each event
+      for (let i = 0; i < events.length; i++) { // for each event
         let diff = 0;
         let freiraum_end = new Date();
 
-        if (i < events.length) { // if this is not the end of day
-          diff = events[i].time_start - startOfSpan; // subtract previous end from current start
-          freiraum_end = events[i].time_start; // the end of the freiraum is the start of the event
-        } else { // ... otherwise
-          diff = endOfDay - startOfSpan; // subtract previous end from the end of the day
-          freiraum_end = endOfDay; // the end of the freiraum is the end of the day
-        }
+        diff = events[i].time_start - startOfSpan; // subtract previous end from current start
+        freiraum_end = events[i].time_start; // the end of the freiraum is the start of the event
 
         if (diff > 1800000) { // if there are atleast 30 mins, in which the room is not occupied
           // mark it as a freiraum
@@ -71,9 +66,13 @@ export function fetchAvailable(fetch_date) {
           slots.push(freiraum);
         }
 
-        if (i < events.length) { // if this is not the end of the day
-          startOfSpan = events[i].time_end; // the start of the next freiraum is the end of the current event
-        }
+        startOfSpan = events[i].time_end; // the start of the next freiraum is the end of the current event
+      }
+
+      if (endOfDay - startOfSpan > 1800000) { // if there are atleast 30 mins, in which the room is not occupied
+        // mark it as a freiraum
+        const freiraum = new Event("Freiraum", room.name, "Freiraum", startOfSpan, endOfDay, dayString);
+        slots.push(freiraum);
       }
 
       freiraume.push({
