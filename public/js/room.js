@@ -1,4 +1,4 @@
-import { fetchXML } from '/js/fetcher.js';
+import { fetchXML } from './fetcher.js';
 
 export class Room {
   constructor(id, name, building, room_no, room_code, comments, number_of_seats) {
@@ -10,20 +10,11 @@ export class Room {
     this.comments = comments;
     this.number_of_seats = number_of_seats;
   }
-
-  toHTML() {
-    return `<div class="room">
-                    <h3>${this.name}</h3>
-                    <p>Gebäude: ${this.building}</p>
-                    <p>Raumnummer: ${this.room_no}</p>
-                    <p>Raum Code: ${this.room_code}</p>
-                    <p>Anmerkungen: ${this.comments}</p>
-                </div>`;
-  }
 }
 
-export function fetchAllRooms() {
-  return fetchXML("http://134.34.26.182/TestRRM/WcfDataService.svc/GetAllRooms()?$orderby%20=%20Raum", (properties, namespaces) => {
+
+export async function fetchAllRooms() {
+  return await fetchXML("http://134.34.26.182/TestRRM/WcfDataService.svc/GetAllRooms()?$orderby%20=%20Raum", (properties, namespaces) => {
     // Define namespaces
     const dNS = namespaces.data;
 
@@ -40,10 +31,10 @@ export function fetchAllRooms() {
       ResRaumID ? ResRaumID.textContent : null,
       Raum ? Raum.textContent : null,
       Geb ? Geb.textContent : null,
-      Raumnr ? Raumnr.textContent : null,
+      Raumnr ? parseInt(Raumnr.textContent) : null,
       Raumcode ? Raumcode.textContent : null,
       Anmerkungen ? Anmerkungen.textContent : null,
-      Platzanzahl ? Platzanzahl.textContent : null
+      Platzanzahl ? parseInt(Platzanzahl.textContent) : null
     );
   });
 }

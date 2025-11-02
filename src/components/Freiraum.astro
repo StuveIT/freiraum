@@ -7,6 +7,7 @@ import Item from './toolbar/Item.astro';
     <Card>
       <Item slot="toolbar">Timeline</Item>
       <Item slot="toolbar">Karte</Item>
+      <Item slot="toolbar">Räume</Item>
 
       <div id="content" slot="body">
       </div>
@@ -28,9 +29,10 @@ import Item from './toolbar/Item.astro';
   </div>
   
 <script type="module" is:inline>
-  import { fetchAvailable } from '/js/room_events.js';
+  import { fetchRoomsWithOccupancy } from '/js/room_events.js';
   import { TimelineUI } from "/js/timeline.js";
   import { GeoUI } from "/js/geo.js";
+  import { RoomsUI } from "/js/rooms.js";
 
   const OK_ELEM = document.getElementById("ok");
   const ERROR_ELEM = document.getElementById("error");
@@ -39,11 +41,14 @@ import Item from './toolbar/Item.astro';
   const content_elem = document.getElementById("content");
   const timeline = new TimelineUI();
   const geo = new GeoUI();
+  const rooms = new RoomsUI();
 
   const VIEW_CLASS = 'view';
   const HIDE_CLASS = 'hide';
+  const DATEPICKER_ID = 'datepicker';
   const TIMELINE_ID = 'timeline';
   const MAP_ID = 'map';
+  const ROOMS_ID = 'rooms';
 
   let curr_view_index = 0;
 
@@ -52,7 +57,7 @@ import Item from './toolbar/Item.astro';
   ---------------------- */
   let ROOMS_WITH_EVENTS;
   function update_data(new_date) {
-    fetchAvailable(new_date).then(roomsWithEvents => {
+    fetchRoomsWithOccupancy(new_date).then(roomsWithEvents => {
       ROOMS_WITH_EVENTS = roomsWithEvents;
       LOADING_ELEM.classList.toggle(HIDE_CLASS, true);
       OK_ELEM.classList.toggle(HIDE_CLASS, false);
@@ -75,13 +80,11 @@ import Item from './toolbar/Item.astro';
     const date_picker = document.createElement('input');
     date_picker.style = "width: 100%";
     date_picker.type = "date";
-    date_picker.id = "date-picker";
+    date_picker.id = DATEPICKER_ID;
     date_picker.valueAsNumber = new_date;
     date_picker.addEventListener("change", (e) => {
-      console.log(e.target);
       update_data(e.target.valueAsDate);
     });
-    
     content_elem.appendChild(date_picker);
 
     // TIMELINE
@@ -96,6 +99,12 @@ import Item from './toolbar/Item.astro';
     map_elem.classList.add(VIEW_CLASS);
     content_elem.appendChild(map_elem);
     geo.display(ROOMS_WITH_EVENTS);
+
+    // ROOMS
+    const rooms_elem = rooms.display(ROOMS_WITH_EVENTS);
+    rooms_elem.id = ROOMS_ID;
+    rooms_elem.classList.add(VIEW_CLASS);
+    content_elem.appendChild(rooms_elem);
 
     // HIDDE ALL + ONLY SHOW INITIAL
     set_view(curr_view_index);
@@ -121,9 +130,13 @@ import Item from './toolbar/Item.astro';
   const set_view = (index) => {
     curr_view_index = index;
     const views = document.getElementsByClassName(VIEW_CLASS);
+
     for (let i = 0; i < views.length; i++) {
       views[i].classList.toggle(HIDE_CLASS, i != index);
+
     }
+
+    document.getElementById(DATEPICKER_ID).classList.toggle(HIDE_CLASS, views[curr_view_index].id == ROOMS_ID);
   }
 
   update_data();

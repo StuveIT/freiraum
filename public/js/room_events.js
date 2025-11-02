@@ -1,87 +1,87 @@
 import { fetchAllEventsForDate, Event } from "./event.js";
 import { fetchAllRooms } from "./room.js";
+import { FREIRAUM_NAME } from "./utils.js";
 
-export function fetchRoomsWithEvents(fetch_date) {
+export async function fetchRoomsWithEvents(fetch_date) {
   if (!fetch_date) // either date or now
     fetch_date = new Date();
 
-  return fetchAllEventsForDate(fetch_date).then(events => {
-    const sortedEvents = events.sort((a, b) => {
-      return a.time_start - b.time_start;
+  const events = await fetchAllEventsForDate(fetch_date);
+
+  const sortedEvents = events.sort((a, b) => {
+    return a.time_start.getTime() - b.time_start.getTime();
+  });
+
+  return fetchAllRooms().then(rooms => {
+    const roomsWithEvents = rooms.map((room) => {
+      const roomEvents = [];
+      for (let j = 0; j < sortedEvents.length; j++) {
+        const currEvent = sortedEvents[j];
+
+        if (currEvent.room_name != room.name)
+          continue;
+
+        roomEvents.push(currEvent);
+      }
+
+      return {
+        room: room,
+        events: roomEvents
+      };
     });
 
-    return fetchAllRooms().then(rooms => {
-      const roomsWithEvents = rooms.map((room) => {
-        const roomEvents = [];
-        for (let j = 0; j < sortedEvents.length; j++) {
-          const currEvent = sortedEvents[j];
-
-          if (currEvent.room_name != room.name)
-            continue;
-
-          roomEvents.push(currEvent);
-        }
-
-        return {
-          room: room,
-          events: roomEvents
-        };
-      });
-
-      return roomsWithEvents;
-    })
-  });
+    return roomsWithEvents;
+  })
 }
 
-
-export function fetchAvailable(fetch_date) {
+export async function fetchRoomsWithOccupancy(fetch_date) {
   if (!fetch_date)
     fetch_date = new Date();
 
-  const dayString = fetch_date.toISOString().split('T')[0];
+  const roomsWithEvents = await fetchRoomsWithEvents(fetch_date);
 
-  return fetchRoomsWithEvents(fetch_date).then(roomsWithEvents => {
-    const freiraume = [];
+  const roomsWithOccupancy = [];
 
-    roomsWithEvents.forEach(roomWithEvents => {
-      const { room, events } = roomWithEvents;
-      const slots = [];
+  roomsWithEvents.forEach(roomWithEvents => {
+    const { room, events } = roomWithEvents;
+    const slots = [];
 
-      let startOfSpan = fetch_date;
-      startOfSpan = new Date(startOfSpan.setHours(8, 0, 0, 0));
+    let startOfSpan = fetch_date;
+    startOfSpan = new Date(startOfSpan.setHours(8, 0, 0, 0));
 
-      let endOfDay = fetch_date;
-      endOfDay.setHours(23, 59, 59, 999);
+    let endOfDay = fetch_date;
+    endOfDay.setHours(23, 59, 59, 999);
 
-      for (let i = 0; i < events.length; i++) { // for each event
-        let diff = 0;
-        let freiraum_end = new Date();
+    for (let i = 0; i < events.length; i++) { // for each event
+      let diff = 0;
+      let freiraum_end = new Date();
 
-        diff = events[i].time_start - startOfSpan; // subtract previous end from current start
-        freiraum_end = events[i].time_start; // the end of the freiraum is the start of the event
+      diff = events[i].time_start.getTime() - startOfSpan.getTime(); // subtract previous end from current start
+      freiraum_end = events[i].time_start; // the end of the freiraum is the start of the event
 
-        if (diff > 1800000) { // if there are atleast 30 mins, in which the room is not occupied
-          // mark it as a freiraum
-          const freiraum = new Event("Freiraum", room.name, "Freiraum", startOfSpan, freiraum_end, dayString);
-          slots.push(freiraum);
-        }
-
-        startOfSpan = events[i].time_end; // the start of the next freiraum is the end of the current event
-      }
-
-      if (endOfDay - startOfSpan > 1800000) { // if there are atleast 30 mins, in which the room is not occupied
+      if (diff > 1800000) { // if there are atleast 30 mins, in which the room is not occupied
         // mark it as a freiraum
-        const freiraum = new Event("Freiraum", room.name, "Freiraum", startOfSpan, endOfDay, dayString);
+        const freiraum = new Event(FREIRAUM_NAME, room.name, FREIRAUM_NAME, startOfSpan, freiraum_end);
         slots.push(freiraum);
       }
 
-      freiraume.push({
-        room: room,
-        events: slots
-      });
+      // push event as well
+      slots.push(events[i]);
+
+      startOfSpan = events[i].time_end; // the start of the next freiraum is the end of the current event
+    }
+
+    if (endOfDay.getTime() - startOfSpan.getTime() > 1800000) { // if there are atleast 30 mins, in which the room is not occupied
+      // mark it as a freiraum
+      const freiraum = new Event("Freiraum", room.name, "Freiraum", startOfSpan, endOfDay);
+      slots.push(freiraum);
+    }
+
+    roomsWithOccupancy.push({
+      room: room,
+      events: slots
     });
-
-    return freiraume;
   });
-}
 
+  return roomsWithOccupancy;
+}
