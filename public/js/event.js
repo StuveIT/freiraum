@@ -28,21 +28,13 @@ function eventMap(properties, namespaces, dayString) {
   const AUhrzeit = properties.getElementsByTagNameNS(dNS, 'AUhrzeit')[0];
   const BUhrzeit = properties.getElementsByTagNameNS(dNS, 'BUhrzeit')[0];
 
-  if (Veranstaltung && Veranstaltung.textContent &&
-    Raum && Raum.textContent &&
-    Betreff && Betreff.textContent &&
-    AUhrzeit && AUhrzeit.textContent &&
-    BUhrzeit && BUhrzeit.textContent)
-    // Store extracted data in an object
-    return new Event(
-      Veranstaltung.textContent,
-      Raum.textContent,
-      Betreff.textContent,
-      dateFromTime(dayString, AUhrzeit.textContent),
-      dateFromTime(dayString, BUhrzeit.textContent),
-    );
-  else
-    throw Error("Could not parse Event");
+  return new Event(
+    Veranstaltung ? Veranstaltung.textContent : null,
+    Raum ? Raum.textContent : null,
+    Betreff ? Betreff.textContent : null,
+    AUhrzeit ? dateFromTime(dayString, AUhrzeit.textContent) : null,
+    BUhrzeit ? dateFromTime(dayString, BUhrzeit.textContent) : null,
+  );
 }
 
 export function fetchAllEventsForDate(date) {

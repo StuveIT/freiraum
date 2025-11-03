@@ -278,16 +278,24 @@ table.timeline td.event-group div.event {
   padding: 4px;
   background-color: var(--background);
   border-radius: 2px;
+  border: var(--seperator);
   height: 100%;
 }
 
 table.timeline td.event-group div.event span {
   width: 100%;
   display: inline-block;
+  color: var(--line-color);
 }
 
 table.timeline td.event-group div.event.freiraum {
   background-color: var(--primary);
+  border: none;
+}
+
+table.timeline td.event-group div.event.freiraum span {
+  background-color: var(--primary);
+  color: var(--text);
 }
 
 #timeline #indicator {
