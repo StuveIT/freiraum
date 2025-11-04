@@ -5,6 +5,7 @@ const ROOM_CLASS = 'room';
 const EVENT_GROUP_CLASS = 'event-group';
 const EVENT_CLASS = 'event';
 const FREIRAUM_CLASS = 'freiraum';
+const MARQUEE_CLASS = 'marquee';
 
 const INDICATOR_ID = 'indicator';
 
@@ -93,4 +94,14 @@ export class TimelineUI {
 
     return table_container;
   }
+
+}
+
+export function loop() {
+  const events = document.getElementsByClassName(EVENT_CLASS);
+  Array.from(events).forEach((event) => {
+    const span = event.childNodes[0];
+    console.log(span.clientWidth, event.clientWidth);
+    span.classList.toggle(MARQUEE_CLASS, span.clientWidth - event.clientWidth > 0);
+  });
 }

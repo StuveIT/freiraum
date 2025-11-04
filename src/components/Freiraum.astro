@@ -30,7 +30,7 @@ import Item from './toolbar/Item.astro';
   
 <script type="module" is:inline>
   import { fetchRoomsWithOccupancy } from '/js/room_events.js';
-  import { TimelineUI } from "/js/timeline.js";
+  import { TimelineUI, loop } from "/js/timeline.js";
   import { GeoUI } from "/js/geo.js";
   import { RoomsUI } from "/js/rooms.js";
 
@@ -140,4 +140,5 @@ import Item from './toolbar/Item.astro';
   }
 
   update_data();
+  setTimeout(loop, 1000);
 </script>
