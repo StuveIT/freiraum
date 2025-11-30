@@ -1,0 +1,45 @@
+---
+---
+<div id="popup-overlay">
+<div id="popup">
+  
+</div>
+</div>
+
+<style>
+  #popup-overlay {
+    visibility: hidden;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, .4);
+    z-index: 9998;
+  }
+
+  #popup {
+    min-width: 100px;
+    min-height: 100px;
+    padding: 8px;
+    background-color: var(--secondary);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    border-radius: 2px;
+  }
+
+  #popup :global(h3) {
+    background-color: var(--primary);
+    padding: 1px 4px;
+  }
+
+  #popup :global(.room_id) {
+    margin-bottom: 4px;
+    width: min-content;
+  }
+  #popup :global(.room_id ~ h3) {
+    margin-top: 0;
+  }
+</style>

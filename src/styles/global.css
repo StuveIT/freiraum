@@ -70,7 +70,7 @@ body {
     justify-content: space-between;
     align-items: center;
 
-    gap: 2em;
+    gap: 4px;
 }
 
 footer {
@@ -234,14 +234,19 @@ form input[type=submit] {
 
 .timeline_container {
   display: flex;
-  flex-direction: row;
-  overflow: hidden;
+  position: sticky;
+  top: 0;
+  flex-direction: column;
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 60vh;
 }
 
 table.timeline {
+  display: table;
   background: white;
-  display: block;
   overflow-x: scroll;
+  overflow-y: auto;
   width: 100%;
   border-spacing: 1px;
 }
@@ -258,7 +263,14 @@ table.timeline > tbody > tr > :first-child {
   z-index: 400;
 }
 
-table.timeline > tbody > td:not(:first-child), table.timeline > tbody th.time {
+table.timeline > thead, table.timeline > thead > tr > th {
+  background-color: var(--background);
+  position: sticky;
+  top: 0;
+  z-index: 401;
+}
+
+table.timeline > tbody > td:not(:first-child), table.timeline > thead th.time {
   width: 100px;
   max-width: 100px;
   min-width: 100px;

@@ -1,7 +1,7 @@
 import { fetchXML } from './fetcher.js';
 
 export class Room {
-  constructor(id, name, building, room_no, room_code, comments, number_of_seats) {
+  constructor(id, name, building, room_no, room_code, comments, number_of_seats, room_type) {
     this.id = id;
     this.name = name;
     this.building = building;
@@ -9,6 +9,7 @@ export class Room {
     this.room_code = room_code;
     this.comments = comments;
     this.number_of_seats = number_of_seats;
+    this.room_type = room_type;
   }
 }
 
@@ -25,6 +26,7 @@ export async function fetchAllRooms() {
     const Raumcode = properties.getElementsByTagNameNS(dNS, "Raumcode")[0];
     const Anmerkungen = properties.getElementsByTagNameNS(dNS, "Anmerkungen")[0];
     const Platzanzahl = properties.getElementsByTagNameNS(dNS, "Platzanzahl")[0];
+    const Bezeichnung = properties.getElementsByTagNameNS(dNS, "Bezeichnung")[0];
 
     // Store extracted data in an object
     return new Room(
@@ -34,7 +36,8 @@ export async function fetchAllRooms() {
       Raumnr ? parseInt(Raumnr.textContent) : null,
       Raumcode ? Raumcode.textContent : null,
       Anmerkungen ? Anmerkungen.textContent : null,
-      Platzanzahl ? parseInt(Platzanzahl.textContent) : null
+      Platzanzahl ? parseInt(Platzanzahl.textContent) : null,
+      Bezeichnung ? Bezeichnung.textContent : null
     );
   });
 }

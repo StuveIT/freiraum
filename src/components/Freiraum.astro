@@ -6,7 +6,7 @@ import Item from './toolbar/Item.astro';
   <div id="ok" class="hide">
     <Card>
       <Item slot="toolbar">Timeline</Item>
-      <Item slot="toolbar">Karte</Item>
+      <!-- <Item slot="toolbar">Karte</Item> -->
       <Item slot="toolbar">Räume</Item>
 
       <div id="content" slot="body">
@@ -30,8 +30,8 @@ import Item from './toolbar/Item.astro';
   
 <script type="module" is:inline>
   import { fetchRoomsWithOccupancy } from '/js/room_events.js';
-  import { TimelineUI, loop } from "/js/timeline.js";
-  import { GeoUI } from "/js/geo.js";
+  import { TimelineUI } from "/js/timeline.js";
+  // import { GeoUI } from "/js/geo.js";
   import { RoomsUI } from "/js/rooms.js";
 
   const OK_ELEM = document.getElementById("ok");
@@ -40,14 +40,14 @@ import Item from './toolbar/Item.astro';
   
   const content_elem = document.getElementById("content");
   const timeline = new TimelineUI();
-  const geo = new GeoUI();
+  // const geo = new GeoUI();
   const rooms = new RoomsUI();
 
   const VIEW_CLASS = 'view';
   const HIDE_CLASS = 'hide';
   const DATEPICKER_ID = 'datepicker';
   const TIMELINE_ID = 'timeline';
-  const MAP_ID = 'map';
+  // const MAP_ID = 'map';
   const ROOMS_ID = 'rooms';
 
   let curr_view_index = 0;
@@ -94,11 +94,11 @@ import Item from './toolbar/Item.astro';
     content_elem.appendChild(timeline_elem);
 
     // MAP
-    const map_elem = geo.initialize();
-    map_elem.id = MAP_ID;
-    map_elem.classList.add(VIEW_CLASS);
-    content_elem.appendChild(map_elem);
-    geo.display(ROOMS_WITH_EVENTS);
+    // const map_elem = geo.initialize();
+    // map_elem.id = MAP_ID;
+    // map_elem.classList.add(VIEW_CLASS);
+    // content_elem.appendChild(map_elem);
+    // geo.display(ROOMS_WITH_EVENTS);
 
     // ROOMS
     const rooms_elem = rooms.display(ROOMS_WITH_EVENTS);
@@ -140,5 +140,13 @@ import Item from './toolbar/Item.astro';
   }
 
   update_data();
-  setTimeout(loop, 1000);
 </script>
+
+<style>
+  #content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+</style>

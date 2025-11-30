@@ -1,3 +1,7 @@
+import { popup_show } from '/js/popup.js';
+
+const WEEKDAYS = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+
 const TIMELINE_CONTAINER_CLASS = 'timeline_container';
 const TIMELINE_CLASS = 'timeline';
 const TIME_CLASS = 'time';
@@ -5,26 +9,25 @@ const ROOM_CLASS = 'room';
 const EVENT_GROUP_CLASS = 'event-group';
 const EVENT_CLASS = 'event';
 const FREIRAUM_CLASS = 'freiraum';
-const MARQUEE_CLASS = 'marquee';
 
 const INDICATOR_ID = 'indicator';
 
-export class TimelineUI {
-  hour_offset = 8;
-  hour_width = 101;
+const HOUR_OFFSET = 8;
+const HOUR_WIDTH = 101;
 
+export class TimelineUI {
   display(roomsWithEvents) {
     const timeline = document.createElement('table');
     timeline.classList.add(TIMELINE_CLASS);
 
-    const timeline_body = document.createElement('tbody');
+    const timeline_header = document.createElement('thead');
 
     const timeline_header_row = document.createElement('tr');
     const thr_name = document.createElement('th');
     thr_name.innerText = 'Raum';
     timeline_header_row.appendChild(thr_name);
 
-    for (let i = this.hour_offset; i < 24; i++) {
+    for (let i = HOUR_OFFSET; i < 24; i++) {
       const thr_time = document.createElement('th');
       thr_time.classList.add(TIME_CLASS);
       thr_time.dataset.time = String(i);
@@ -32,7 +35,10 @@ export class TimelineUI {
       timeline_header_row.appendChild(thr_time);
     }
 
-    timeline_body.appendChild(timeline_header_row);
+    timeline_header.appendChild(timeline_header_row);
+    timeline.appendChild(timeline_header);
+
+    const timeline_body = document.createElement('tbody');
     timeline.appendChild(timeline_body);
 
     roomsWithEvents.forEach(roomWithEvents => {
@@ -41,7 +47,7 @@ export class TimelineUI {
       const tr_room_events = document.createElement('tr');
       const td_room = document.createElement('td');
       td_room.classList.add(ROOM_CLASS);
-      td_room.title = `Plätze: ${room.number_of_seats}\n${room.comments}`;
+      td_room.title = `${room.room_type ? room.room_type + ' ' : ''}\nPlätze: ${room.number_of_seats}\n${room.comments}`;
       td_room.innerText = room.name;
       tr_room_events.appendChild(td_room);
 
@@ -53,16 +59,26 @@ export class TimelineUI {
         div_event.classList.add(EVENT_CLASS);
         div_event.classList.toggle(FREIRAUM_CLASS, e.name == "Freiraum");
 
-        const time_factor_start = (e.time_start.getHours() - this.hour_offset) + (e.time_start.getMinutes() / 60);
-        const time_factor_end = (e.time_end.getHours() - this.hour_offset) + e.time_end.getMinutes() / 60;
+        const time_factor_start = (e.time_start.getHours() - HOUR_OFFSET) + (e.time_start.getMinutes() / 60);
+        const time_factor_end = (e.time_end.getHours() - HOUR_OFFSET) + e.time_end.getMinutes() / 60;
         const time_factor_span = time_factor_end - time_factor_start;
 
-        div_event.title = `${e.name}\n${e.time_start}\n${e.time_end}`;
-        div_event.style = `left: ${this.hour_width * time_factor_start}px; width: ${this.hour_width * time_factor_span}px;`;
+        div_event.title = `${e.name}${e.person ? " - " + e.person : ""}\n${e.time_start}\n${e.time_end}`;
+        div_event.style = `left: ${HOUR_WIDTH * time_factor_start}px; width: ${HOUR_WIDTH * time_factor_span}px;`;
 
         const event_span = document.createElement('span');
         event_span.innerText = e.name;
         div_event.appendChild(event_span);
+
+        div_event.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          popup_show(`
+            <h4 class="room_id">${room.name}</h4>
+            <h3>${e.name}${e.department ? " - " + e.department : ""}</h3>
+            <p>${WEEKDAYS[e.time_start.getDay()]} ${("" + e.time_start.getHours()).padStart(2, "0")}:${("" + e.time_start.getMinutes()).padStart(2, "0")} - ${("" + e.time_end.getHours()).padStart(2, "0")}:${("" + e.time_start.getMinutes()).padStart(2, "0")}</p>
+            ${e.person ? "<small>Gebucht auf " + e.person + "</small>" : ""}
+          `, ev);
+        });
 
         trr_events_div.appendChild(div_event);
       });
@@ -80,28 +96,23 @@ export class TimelineUI {
     table_container.appendChild(timeline);
 
     // time pos
-    timeline.addEventListener("scroll", () => {
-      // time pos
-      let time_x_pos = this.hour_width * ((new Date()).getHours() - this.hour_offset);
-
-      // scroll to current time
-      let timeline = document.getElementsByClassName(TIMELINE_CLASS)[0];
-      let curr_left = timeline.scrollLeft;
-
-      // update indicator
-      indicator.style.transform = `translateX(${time_x_pos - curr_left + this.hour_width}px)`;
-    });
+    timeline.addEventListener("scroll", () => update_indicator());
 
     return table_container;
   }
-
 }
 
-export function loop() {
-  const events = document.getElementsByClassName(EVENT_CLASS);
-  Array.from(events).forEach((event) => {
-    const span = event.childNodes[0];
-    console.log(span.clientWidth, event.clientWidth);
-    span.classList.toggle(MARQUEE_CLASS, span.clientWidth - event.clientWidth > 0);
-  });
+function update_indicator() {
+  // time pos
+  let time_x_pos = HOUR_WIDTH * ((new Date()).getHours() - HOUR_OFFSET);
+
+  // scroll to current time
+  let timeline = document.getElementsByClassName(TIMELINE_CLASS)[0];
+  if (!timeline) return;
+
+  let curr_left = timeline.scrollLeft;
+
+  // update indicator
+  const indicator = document.getElementById(INDICATOR_ID);
+  indicator.style.transform = `translateX(${time_x_pos - curr_left + HOUR_WIDTH}px)`;
 }
