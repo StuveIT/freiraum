@@ -48,6 +48,15 @@ export class TimelineUI {
       const td_room = document.createElement('td');
       td_room.classList.add(ROOM_CLASS);
       td_room.title = `${room.room_type ? room.room_type + ' ' : ''}\nPlätze: ${room.number_of_seats}\n${room.comments}`;
+      td_room.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        popup_show(`
+          <h4 class="room_id">${room.room_type ? room.room_type + ' ' : ''}</h4>
+          <h3>${room.name}</h3>
+          <p>Plätze: ${room.number_of_seats}</p>
+          <p>${room.comments}</p>
+        `);
+      });
       td_room.innerText = room.name;
       tr_room_events.appendChild(td_room);
 
@@ -94,6 +103,7 @@ export class TimelineUI {
     table_container.classList.add(TIMELINE_CONTAINER_CLASS);
     table_container.appendChild(indicator);
     table_container.appendChild(timeline);
+
 
     // time pos
     update_indicator();
