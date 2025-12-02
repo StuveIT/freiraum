@@ -23,8 +23,6 @@ function eventMap(properties, namespaces, dayString) {
   // Define namespaces
   const dNS = namespaces.data;
 
-  console.log(properties);
-
   const Veranstaltung = properties.getElementsByTagNameNS(dNS, 'Veranstaltung')[0];
   // const Dauer = properties.getElementsByTagNameNS(dNS, 'Dauer')[0];
   const Raum = properties.getElementsByTagNameNS(dNS, 'Raum')[0];

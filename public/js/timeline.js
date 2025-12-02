@@ -96,13 +96,14 @@ export class TimelineUI {
     table_container.appendChild(timeline);
 
     // time pos
-    timeline.addEventListener("scroll", () => update_indicator());
+    update_indicator();
+    setInterval(() => update_indicator(), 1000);
 
     return table_container;
   }
 }
 
-function update_indicator() {
+export function update_indicator() {
   // time pos
   let time_x_pos = HOUR_WIDTH * ((new Date()).getHours() - HOUR_OFFSET);
 

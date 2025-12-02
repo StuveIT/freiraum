@@ -334,7 +334,8 @@ table.timeline td.event-group div.event.freiraum span {
 /* } */
 
 #timeline #indicator {
-  position: sticky;
+  position: absolute;
+  height: 100%;
   border-right: 2px solid red;
   z-index: 1000;
   transform: translateX(-2px); /* Should be hidden from the start */
