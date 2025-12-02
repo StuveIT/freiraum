@@ -114,16 +114,24 @@ export class TimelineUI {
 }
 
 export function update_indicator() {
+  // first column
+  let first_column = document.querySelector('table.timeline > tbody > tr > :first-child');
+
+  if (!first_column) {
+    return;
+  }
+
   // time pos
-  let time_x_pos = HOUR_WIDTH * ((new Date()).getHours() - HOUR_OFFSET);
+  let now = new Date();
+  let time_x_pos = HOUR_WIDTH * (now.getHours() - HOUR_OFFSET) + now.getMinutes() * (HOUR_WIDTH / 60);
+  let FIRST_COLUMN_WIDTH = first_column.getBoundingClientRect().width;
 
   // scroll to current time
   let timeline = document.getElementsByClassName(TIMELINE_CLASS)[0];
   if (!timeline) return;
 
-  let curr_left = timeline.scrollLeft;
-
   // update indicator
   const indicator = document.getElementById(INDICATOR_ID);
-  indicator.style.transform = `translateX(${time_x_pos - curr_left + HOUR_WIDTH}px)`;
+  indicator.style.transform = `translateX(${time_x_pos + FIRST_COLUMN_WIDTH}px)`;
+  indicator.style.height = `${timeline.getBoundingClientRect().height}px`;
 }
