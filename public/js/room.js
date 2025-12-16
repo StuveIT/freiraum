@@ -15,7 +15,7 @@ export class Room {
 
 
 export async function fetchAllRooms() {
-  return await fetchXML("http://134.34.26.182/TestRRM/WcfDataService.svc/GetAllRooms()?$orderby%20=%20Raum", (properties, namespaces) => {
+  const map_to_room = (properties, namespaces) => {
     // Define namespaces
     const dNS = namespaces.data;
 
@@ -39,5 +39,10 @@ export async function fetchAllRooms() {
       Platzanzahl ? parseInt(Platzanzahl.textContent) : null,
       Bezeichnung ? Bezeichnung.textContent : null
     );
-  });
+  };
+
+  const overall_xml = await fetchXML("http://134.34.26.182/TestRRM/WcfDataService.svc/GetAllRooms()?$orderby%20=%20Raum", map_to_room);
+  const bib_xml = await fetchXML("http://134.34.26.182/roomresbib/WcfDataService.svc//GetAllRooms()?$orderby%20=%20Raum", map_to_room);
+
+  return overall_xml.concat(bib_xml).sort((a, b) => a.name.localeCompare(b.name));
 }

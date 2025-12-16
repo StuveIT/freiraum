@@ -43,10 +43,14 @@ function eventMap(properties, namespaces, dayString) {
   );
 }
 
-export function fetchAllEventsForDate(date) {
+export async function fetchAllEventsForDate(date) {
   const dayString = date.toISOString().split('T')[0];
 
-  const url = `http://134.34.26.182/TestRRM/WcfDataService.svc/GetAllEvents()?$filter=(TDate%20eq%20datetime%27${dayString}%27)`;
+  const overall_url = `http://134.34.26.182/TestRRM/WcfDataService.svc/GetAllEvents()?$filter=(TDate%20eq%20datetime%27${dayString}%27)`;
+  const bib_url = `http://134.34.26.182/roomresbib/WcfDataService.svc/GetAllEvents()?$filter=(TDate%20eq%20datetime%27${dayString}%27)`;
 
-  return fetchXML(url, (properties, namespaces) => eventMap(properties, namespaces, dayString));
+  const overall_xml = await fetchXML(overall_url, (properties, namespaces) => eventMap(properties, namespaces, dayString));
+  const bib_xml = await fetchXML(bib_url, (properties, namespaces) => eventMap(properties, namespaces, dayString));
+
+  return overall_xml.concat(bib_xml);
 }
