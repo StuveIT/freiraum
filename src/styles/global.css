@@ -138,6 +138,27 @@ a {
     text-decoration: none;
 }
 
+a.pill {
+  background-color: var(--primary);
+  border-radius: 5px;
+  border: none;
+  margin: 0 5px;
+  padding: 2px 5px;
+  font-weight: bold;
+  z-index: 9999;
+}
+
+a.pill.left {
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+  border-right: 1px solid var(--text);
+}
+
+a.pill.right {
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+
 i {
     font-size: 1.2em;
     color: var(--text);
