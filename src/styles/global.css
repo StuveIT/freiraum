@@ -10,7 +10,7 @@
     --standard-box-shadow: 0 0 182px 0px rgba(0, 0, 0, .2);
 
     --positive: #00A9E0;
-    --negative: #FF0000;
+    --negative: #e33467;
     --neutral: #424242;
 
     --normal-weight: 300;
@@ -358,7 +358,7 @@ table.timeline td.event-group div.event.freiraum span {
 #timeline #indicator {
   position: absolute;
   height: 100%;
-  border-right: 2px solid red;
+  border-right: 2px solid var(--negative);
   z-index: 1000;
   transform: translateX(-2px); /* Should be hidden from the start */
 }
