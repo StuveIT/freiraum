@@ -1,6 +1,6 @@
 import { fetchXML } from './fetcher.js';
 
-const BLACKLIST = ["BA439a", "BA439b", "BA440"];
+const BLACKLIST = ["BA420", "BA439a", "BA439b", "BA440"];
 
 export class Room {
   constructor(id, name, building, room_no, room_code, comments, number_of_seats, room_type) {
