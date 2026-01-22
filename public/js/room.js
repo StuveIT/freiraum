@@ -1,5 +1,7 @@
 import { fetchXML } from './fetcher.js';
 
+const BLACKLIST = ["BA439a", "BA439b", "BA440"];
+
 export class Room {
   constructor(id, name, building, room_no, room_code, comments, number_of_seats, room_type) {
     this.id = id;
@@ -41,8 +43,10 @@ export async function fetchAllRooms() {
     );
   };
 
-  const overall_xml = await fetchXML("http://134.34.26.182/TestRRM/WcfDataService.svc/GetAllRooms()?$orderby%20=%20Raum", map_to_room);
-  const bib_xml = await fetchXML("http://134.34.26.182/roomresbib/WcfDataService.svc//GetAllRooms()?$orderby%20=%20Raum", map_to_room);
+  const regular_xml = await fetchXML("http://134.34.26.182/TestRRM/WcfDataService.svc/GetAllRooms()?$orderby%20=%20Raum", map_to_room);
+  const bib_xml = await fetchXML("http://134.34.26.182/roomresbib/WcfDataService.svc/GetAllRooms()?$orderby%20=%20Raum", map_to_room);
 
-  return overall_xml.concat(bib_xml).sort((a, b) => a.name.localeCompare(b.name));
+  let overall_xml = regular_xml.concat(bib_xml).sort((a, b) => a.name.localeCompare(b.name)).filter((room) => !BLACKLIST.includes(room.name));
+
+  return overall_xml;
 }
