@@ -1,4 +1,4 @@
-export async function fetchXML(url, entryMap, method = 'GET', signal = AbortSignal.timeout(5000)) {
+export async function fetchXML(url, entryMap, method = 'GET', signal = AbortSignal.timeout(10000)) {
   /**
    * Fetches XML data from a given URL and processes it.
    * @param {string} url - The URL to fetch the XML from.
