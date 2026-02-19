@@ -1,6 +1,7 @@
 import { fetchXML } from './fetcher.js';
 
 const BLACKLIST = ["BA420", "BA439a", "BA439b", "BA440", "BS522"];
+const PERIOD_BREAK_WHITELIST = ["B0602", "C0230", "C0358", "C0423", "C0427", "D0432", "D0436", "D0522", "E0403", "E0404", "F0425", "F0427", "G0203", "G0227", "G0227a", "H0244", "K0503", "L0829", "L0914", "M0701", "M0801", "M0901", "M1001", "M1101", "ML630", "P0712", "P0812", "P0912", "P01012", "P1138", "PZ0801", "PZ0901", "PZ1001", "V0403", "V0837", "Y0310", "Z1003", "ZT702", "ZT1202"];
 
 export class Room {
   constructor(id, name, building, room_no, room_code, comments, number_of_seats, room_type) {
@@ -46,7 +47,7 @@ export async function fetchAllRooms() {
   const regular_xml = await fetchXML("http://134.34.26.182/TestRRM/WcfDataService.svc/GetAllRooms()?$orderby%20=%20Raum", map_to_room);
   const bib_xml = await fetchXML("http://134.34.26.182/roomresbib/WcfDataService.svc/GetAllRooms()?$orderby%20=%20Raum", map_to_room);
 
-  let overall_xml = regular_xml.concat(bib_xml).sort((a, b) => a.name.localeCompare(b.name)).filter((room) => !BLACKLIST.includes(room.name));
+  let overall_xml = regular_xml.concat(bib_xml).sort((a, b) => a.name.localeCompare(b.name)).filter((room) => !BLACKLIST.includes(room.name) && PERIOD_BREAK_WHITELIST.includes(room.name));
 
   return overall_xml;
 }
