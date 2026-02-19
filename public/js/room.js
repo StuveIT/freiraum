@@ -13,6 +13,7 @@ export class Room {
     this.comments = comments;
     this.number_of_seats = number_of_seats;
     this.room_type = room_type;
+    this.open = true;
   }
 }
 
@@ -47,7 +48,10 @@ export async function fetchAllRooms() {
   const regular_xml = await fetchXML("http://134.34.26.182/TestRRM/WcfDataService.svc/GetAllRooms()?$orderby%20=%20Raum", map_to_room);
   const bib_xml = await fetchXML("http://134.34.26.182/roomresbib/WcfDataService.svc/GetAllRooms()?$orderby%20=%20Raum", map_to_room);
 
-  let overall_xml = regular_xml.concat(bib_xml).sort((a, b) => a.name.localeCompare(b.name)).filter((room) => !BLACKLIST.includes(room.name) && PERIOD_BREAK_WHITELIST.includes(room.name));
+  let overall_xml = regular_xml.concat(bib_xml).sort((a, b) => a.name.localeCompare(b.name)).filter((room) => !BLACKLIST.includes(room.name)).map((room) => {
+    room.open = PERIOD_BREAK_WHITELIST.includes(room.name);
+    return room;
+  });
 
   return overall_xml;
 }

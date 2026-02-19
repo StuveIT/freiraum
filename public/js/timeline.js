@@ -6,6 +6,7 @@ const TIMELINE_CONTAINER_CLASS = 'timeline_container';
 const TIMELINE_CLASS = 'timeline';
 const TIME_CLASS = 'time';
 const ROOM_CLASS = 'room';
+const CLOSED_ROOM_CLASS = 'closed';
 const EVENT_GROUP_CLASS = 'event-group';
 const EVENT_CLASS = 'event';
 const FREIRAUM_CLASS = 'freiraum';
@@ -45,6 +46,8 @@ export class TimelineUI {
       const { room, events } = roomWithEvents;
 
       const tr_room_events = document.createElement('tr');
+      tr_room_events.classList.toggle(CLOSED_ROOM_CLASS, !room.open);
+
       const td_room = document.createElement('td');
       td_room.classList.add(ROOM_CLASS);
       td_room.title = `${room.room_type ? room.room_type + ' ' : ''}\nPlätze: ${room.number_of_seats}\n${room.comments}`;
@@ -58,6 +61,7 @@ export class TimelineUI {
         `);
       });
       td_room.innerText = room.name;
+
       tr_room_events.appendChild(td_room);
 
       // add events
