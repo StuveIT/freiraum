@@ -1,6 +1,6 @@
 import { fetchXML } from './fetcher.js';
 
-const BLACKLIST = ["BA420", "BA439a", "BA439b", "BA440", "BS522"];
+const BLACKLIST = ["BA420", "BA439a", "BA439b", "BA440", "BS522", "BHPMC", "H0308", "BG335"];
 // const PERIOD_BREAK_WHITELIST = ["B0602", "C0230", "C0358", "C0423", "C0427", "D0432", "D0436", "D0522", "E0403", "E0404", "F0425", "F0427", "G0203", "G0227", "G0227a", "H0244", "K0503", "L0829", "L0914", "M0701", "M0801", "M0901", "M1001", "M1101", "ML630", "P0712", "P0812", "P0912", "P01012", "P1138", "PZ0801", "PZ0901", "PZ1001", "V0403", "V0837", "Y0310", "Z1003", "ZT702", "ZT1202"];
 
 export class Room {
