@@ -2,14 +2,13 @@
 import Card from './Card.astro';
 import Item from './toolbar/Item.astro';
 ---
-
   <div id="ok" class="hide">
     <Card>
       <Item slot="toolbar">Timeline</Item>
       <!-- <Item slot="toolbar">Karte</Item> -->
       <Item slot="toolbar">Räume</Item>
 
-      <div slot="body">
+        <div slot="body">
         <div id="content"></div>
 
         <br/>
@@ -24,16 +23,31 @@ import Item from './toolbar/Item.astro';
   <div id="error" class="hide">
     <Card>
       <div slot="body">
-        ⚠️ Dein Browser konnte keine Anfrage an <a href="134.34.26.182">RoomRes</a> stellen. Das kann folgende Gründe haben: 
-      <ul>
-        <li>Du bist nicht im Uni-Netz. Falls du dich nicht an der Uni Konstanz aufhälst, kannst du ein VPN benutzen (Siehe: <a href="https://www.kim.uni-konstanz.de/e-mail-und-internet/eduvpn/">KIM Website</a>)</li>
-        <!-- <li>Dein Browser upgraded deine HTTP Verbindung zu HTTPS. RoomRes ist gerade nur unter dem HTTP Protokoll erreichbar --- wir arbeiten mit dem KIM zusammen, um das zu verbessern</li> -->
-        <li>RoomRes ist gerade nicht erreichbar</li>
-      </ul>
+        <h1>⚠️ Anfrage fehlgeschlagen</h1>
+        <p>
+        Dein Browser konnte keine Anfrage an <a href="134.34.26.182">RoomRes</a> stellen. Das kann folgende Gründe haben: 
+        </p>
+        <ul>
+          <li>Du bist nicht im Uni-Netz. Falls du dich nicht an der Uni Konstanz aufhälst, kannst du ein VPN benutzen (Siehe: <a href="https://www.kim.uni-konstanz.de/e-mail-und-internet/eduvpn/">KIM Website</a>)</li>
+          <li>RoomRes ist gerade nicht erreichbar</li>
+        </ul>
       </div>
     </Card>
   </div>
-  <div id="loading">
+  <div id="load">
+    <Card>
+      <div slot="body">
+        <h1>Freiraum</h1>
+        <p>Du findest in der Bibliothek keine freien Arbeitsplätze mehr?</p>
+        <p><b>Kein Problem:</b> Du kannst auch einfach freie Seminarräume zum Lernen verwenden. Um herauszufinden, welche gerade frei sind, hat die StuVe das Freiraum-Tool entwickelt. Dieses greift auf die Raumverwaltungssoftware der Uni zu und zeigt die Verfügbarkeit von Räumen übersichtlich an. Du kannst die Verfügbarkeit zum aktuellen Zeitpunkt sehen und auch Uhrzeit und Datum auswählen. Mit Klick auf den Raum bekommst du weitere Infos zur Kapazität und Ausstattung.</p>
+        <p><b>Wichtig:</b> Du musst im Uni-Netzwerk sein, um auf die Daten zuzugreifen (wenn du zuhause bist, kannst du den <a href="https://www.kim.uni-konstanz.de/e-mail-und-internet/eduvpn/">VPN</a> benutzen).</p>
+
+        <div id="loading-container">
+          <div id="loading">
+          </div>
+        </div>
+      </div>
+    </Card>
   </div>
   
 <script type="module" is:inline>
@@ -44,7 +58,7 @@ import Item from './toolbar/Item.astro';
 
   const OK_ELEM = document.getElementById("ok");
   const ERROR_ELEM = document.getElementById("error");
-  const LOADING_ELEM = document.getElementById("loading");
+  const LOADING_ELEM = document.getElementById("load");
   
   const content_elem = document.getElementById("content");
   const timeline = new TimelineUI();

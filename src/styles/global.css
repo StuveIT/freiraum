@@ -130,8 +130,9 @@ p {
     text-overflow: ellipsis;
 }
 
-p, li, a {
+p, ul, li, a {
     line-height: 1.5;
+    max-width: 1000px;
 }
 
 a {
@@ -397,8 +398,10 @@ tr.closed {
   opacity: .1;
 }
 
-#ok:not(.hide), #error:not(.hide) {
-  width: 100%;
+#loading-container:not(.hide) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 #loading {
