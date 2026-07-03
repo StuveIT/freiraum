@@ -398,6 +398,10 @@ tr.closed {
   opacity: .1;
 }
 
+#ok, #error, #loading {
+  max-width: 100%;
+}
+
 #loading-container:not(.hide) {
   display: flex;
   flex-direction: column;
